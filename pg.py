@@ -178,7 +178,7 @@ class Environment:
         self.n_food = n_food
         self.food_rate = food_rate
         self.pop_count = n_individuals
-        self.pop_genes = self.get_population_genetics()
+        self.pop_genes = self.get_population_genetics(self.animals)
         self.history = []
         self.steps = 0
 
@@ -216,9 +216,10 @@ class Environment:
         total_age = np.sum([animal.age for animal in self.animals])
         return total_age/len(self.animals)
 
-    def get_population_genetics(self):  # TODO: Find a way of doing this faster
+    def get_population_genetics(self, animals):  # TODO: Find a way of doing this faster
         gene_counts = {}
         try:
+            # Get all the genes in the population
             genes = np.concatenate([x.genes for x in self.animals])
         except ValueError:  # Only one individual left
             try:
@@ -227,7 +228,7 @@ class Environment:
                 return {k: 0 for k in self.species.genome}
 
         gene, counts = np.unique(genes, return_counts=True)
-        for g in ['a', 'b', 'c', 'd']:
+        for g in self.species.genome:
             try:
                 idx = np.where(gene == g)
                 gene_counts[g] = counts[idx][0]
@@ -235,7 +236,7 @@ class Environment:
                 gene_counts[g] = 0
 
         total_genes = np.sum(list(gene_counts.values()))
-        return {k:v/total_genes for k,v in gene_counts.items()}
+        return {k: v/total_genes for k, v in gene_counts.items()}
 
     def advance(self):
         self.n_food += self.food_rate
@@ -246,10 +247,14 @@ class Environment:
 
         self.pop_count = len(self.animals)
         self.pop_mean_age = self.get_pop_age()
-        self.pop_genes = self.get_population_genetics()
+        self.pop_genes = self.get_population_genetics(self.animals)
 
         self.steps += 1
-        return State(self.steps, self.pop_count, self.pop_mean_age, self.pop_genes, self.n_food)
+        return State(self.steps,
+                     self.pop_count,
+                     self.pop_mean_age,
+                     self.pop_genes,
+                     self.n_food)
 
     def run(self, n_iters=100):
         for i in range(n_iters):

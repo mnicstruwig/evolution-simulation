@@ -178,7 +178,7 @@ class Environment:
         self.n_food = n_food
         self.food_rate = food_rate
         self.pop_count = n_individuals
-        self.pop_genes = self.get_population_genetics(self.animals)
+        self.pop_genes = self._get_population_genetics()
         self.history = []
         self.steps = 0
 
@@ -216,7 +216,7 @@ class Environment:
         total_age = np.sum([animal.age for animal in self.animals])
         return total_age/len(self.animals)
 
-    def get_population_genetics(self, animals):  # TODO: Find a way of doing this faster
+    def _get_population_genetics(self):  # TODO: Find a way of doing this faster
         gene_counts = {}
         try:
             # Get all the genes in the population
@@ -247,7 +247,7 @@ class Environment:
 
         self.pop_count = len(self.animals)
         self.pop_mean_age = self.get_pop_age()
-        self.pop_genes = self.get_population_genetics(self.animals)
+        self.pop_genes = self._get_population_genetics()
 
         self.steps += 1
         return State(self.steps,
